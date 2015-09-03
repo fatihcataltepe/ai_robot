@@ -231,10 +231,16 @@ public class VisualisationPanel extends JComponent {
                it.remove(); // avoids a ConcurrentModificationException
             }
 
+            int cun = 0;
             for (Point2D.Double f : problemSetup.getFreeSpace()) {
+               System.out.println(cun++);
                g2.setColor(Color.green);
-               g2.drawRect((int) (f.getX() * getWidth()), (int) (getHeight() - f.getY() * getHeight()), 3, 3);
+               // g2.drawRect((int) (f.getX() * getWidth()), (int) (getHeight() - f.getY() * getHeight()), 3, 3);
                // paintState(g2, new ArmConfig(f, new ArrayList<Double>()));
+            }
+
+            for (ArmConfig a : problemSetup.getRandomArms()) {
+//               paintState(g2, a);
             }
             // --------------------------------------------------------------------------------
          }

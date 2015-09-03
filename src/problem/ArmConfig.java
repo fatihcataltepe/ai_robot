@@ -10,7 +10,7 @@ import tester.Tester;
 /**
  * Represents a configuration of the arm, i.e. base x-y coordinates and joint angles. This class doesn't do any validity checking.
  */
-public class ArmConfig {
+public class ArmConfig implements Comparable<ArmConfig>{
 
    /** Length of each link */
    public static final double LINK_LENGTH = 0.05;
@@ -67,6 +67,11 @@ public class ArmConfig {
       links = cfg.getLinks();
    }
 
+   public static ArmConfig factory(int numOfJoint) {
+      Random rand = new Random();
+      return factory(new Point2D.Double(rand.nextDouble(), rand.nextDouble()), numOfJoint);
+   }
+
    public static ArmConfig factory(Point2D base, int numOfJoint) {
       List<Double> jointAngles = new ArrayList<>();
       for (int i = 0; i < numOfJoint; i++) {
@@ -107,7 +112,7 @@ public class ArmConfig {
     * 
     * @return the base position.
     */
-   public Point2D getBase() {
+   public Point2D.Double getBase() {
       return new Point2D.Double(base.getX(), base.getY());
    }
 
@@ -211,5 +216,10 @@ public class ArmConfig {
          x1 = x2;
          y1 = y2;
       }
+   }
+
+   @Override
+   public int compareTo(ArmConfig o) {
+      return 0;
    }
 }
