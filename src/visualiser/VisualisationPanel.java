@@ -5,10 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.*;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.*;
 
@@ -212,24 +209,24 @@ public class VisualisationPanel extends JComponent {
             paintState(g2, problemSetup.getGoalState());
 
             // --------------------------------------------------------------------------------
-            Iterator it = problemSetup.getMap().entrySet().iterator();
-            while (it.hasNext()) {
-               Map.Entry<ArmConfig, List<ArmConfig>> pair = (Map.Entry) it.next();
-               ArmConfig curr = pair.getKey();
-               ArrayList<ArmConfig> children = (ArrayList<ArmConfig>) pair.getValue();
-
-               int counter = 0;
-               for (ArmConfig c : children) {
-                  g2.setColor(Color.black);
-                  g2.drawLine((int) (curr.getBase().getX() * getWidth()),
-                              (int) (getHeight() - getHeight() * curr.getBase().getY()),
-                              (int) (c.getBase().getX() * getWidth()),
-                              (int) (getHeight() - getHeight() * c.getBase().getY()));
-
-               }
-
-               it.remove(); // avoids a ConcurrentModificationException
-            }
+            // Iterator it = problemSetup.getMap().entrySet().iterator();
+            // while (it.hasNext()) {
+            // Map.Entry<ArmConfig, List<ArmConfig>> pair = (Map.Entry) it.next();
+            // ArmConfig curr = pair.getKey();
+            // ArrayList<ArmConfig> children = (ArrayList<ArmConfig>) pair.getValue();
+            //
+            // int counter = 0;
+            // for (ArmConfig c : children) {
+            // g2.setColor(Color.black);
+            // g2.drawLine((int) (curr.getBase().getX() * getWidth()),
+            // (int) (getHeight() - getHeight() * curr.getBase().getY()),
+            // (int) (c.getBase().getX() * getWidth()),
+            // (int) (getHeight() - getHeight() * c.getBase().getY()));
+            //
+            // }
+            //
+            // it.remove(); // avoids a ConcurrentModificationException
+            // }
 
             int cun = 0;
             for (Point2D.Double f : problemSetup.getFreeSpace()) {

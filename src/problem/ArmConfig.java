@@ -10,7 +10,7 @@ import tester.Tester;
 /**
  * Represents a configuration of the arm, i.e. base x-y coordinates and joint angles. This class doesn't do any validity checking.
  */
-public class ArmConfig implements Comparable<ArmConfig>{
+public class ArmConfig {
 
    /** Length of each link */
    public static final double LINK_LENGTH = 0.05;
@@ -37,8 +37,8 @@ public class ArmConfig implements Comparable<ArmConfig>{
    }
 
    /**
-    * Constructs an ArmConfig from a space-separated string. The first two numbers are the x and y coordinates of the robot's base.
-    * The subsequent numbers are the joint angles in sequential order defined in radians.
+    * Constructs an ArmConfig from a space-separated string. The first two numbers are the x and y coordinates asasof the robot's
+    * base. The subsequent numbers are the joint angles in sequential order defined in radians.
     * 
     * @param str
     *           The String containing the values
@@ -219,7 +219,21 @@ public class ArmConfig implements Comparable<ArmConfig>{
    }
 
    @Override
-   public int compareTo(ArmConfig o) {
-      return 0;
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      ArmConfig armConfig = (ArmConfig) o;
+
+      if (!base.equals(armConfig.base)) return false;
+      return jointAngles.equals(armConfig.jointAngles);
+
+   }
+
+   @Override
+   public int hashCode() {
+      int result = base.hashCode();
+      result = 31 * result + jointAngles.hashCode();
+      return result;
    }
 }

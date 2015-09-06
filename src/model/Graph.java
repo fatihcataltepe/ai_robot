@@ -8,6 +8,7 @@ import java.util.*;
 
 import problem.ArmConfig;
 import problem.Obstacle;
+import tester.Tester;
 
 /**
  * Created by fatihcataltepe on 01/09/15.
@@ -15,10 +16,14 @@ import problem.Obstacle;
 public class Graph {
    private HashMap<ArmConfig, List<ArmConfig>> map;
    private List<Obstacle>                      obstacles;
-   private final int numOfEdges = 10;
+   private final int                           numOfEdges         = 10;
+   private int                                 numOfSamplesOnPath = 10;
 
    public Graph(List<ArmConfig> randomArms, List<Obstacle> obstacles) {
       this.obstacles = obstacles;
+
+      int counterWrong = 0;
+      int counterRight = 0;
 
       map = new HashMap<>();
 
@@ -36,18 +41,29 @@ public class Graph {
 
          SortedSet<Double> sortedSet = new TreeSet<Double>(treeMap.keySet());
 
+         // creates a -> b edges at number of edges
          int counter = 0;
-         for (Double d:sortedSet) {
-            if(d != 0) {
+         for (Double d : sortedSet) {
+            if (d != 0) {
                ArmConfig arm = treeMap.get(d);
-               if (!checkObstacles(curr.getBase(), arm.getBase())) {
+               boolean checkPath = checkSamplesOnPath(getArmsOnPath(curr, arm));
+               if (checkPath) {
+                  counterWrong++;
+               }
+               else {
+                  counterRight++;
+               }
+               if (!checkObstacles(curr.getBase(), arm.getBase()) && !checkPath) {
                   counter++;
                   map.get(curr).add(arm);
                }
             }
-            if(counter >= numOfEdges) break;
+            if (counter >= numOfEdges)
+               break;
          }
-         printMap(map);
+//         System.out.println("collision: " + counterWrong);
+//         System.out.println("collision free: " + counterRight);
+         // printMap(map);
       }
    }
 
@@ -68,6 +84,42 @@ public class Graph {
          System.out.println(pair.getKey() + " = " + pair.getValue().size());
          it.remove(); // avoids a ConcurrentModificationException
       }
+   }
+
+   public List<ArmConfig> getArmsOnPath(ArmConfig a, ArmConfig b) {
+      List<ArmConfig> retVal = new ArrayList<>();
+
+      double deltaX = (b.getBase().getX() - a.getBase().getX()) / numOfSamplesOnPath;
+      double deltaY = (b.getBase().getY() - a.getBase().getY()) / numOfSamplesOnPath;
+
+      List<Double> deltaAngles = new ArrayList<>();
+      for (int i = 0; i < a.getJointAngles().size(); i++) {
+         deltaAngles.add((b.getJointAngles().get(i) - a.getJointAngles().get(i)) / numOfSamplesOnPath);
+      }
+
+      for (int i = 0; i < numOfSamplesOnPath; i++) {
+         double x = a.getBase().getX() + (i * deltaX);
+         double y = a.getBase().getY() + (i * deltaY);
+
+         List<Double> jointAngles = new ArrayList<>();
+         for (int j = 0; j < a.getJointAngles().size(); j++) {
+            jointAngles.add(a.getJointAngles().get(j) + (i * deltaAngles.get(j)));
+         }
+
+         retVal.add(new ArmConfig(new Point2D.Double(x, y), jointAngles));
+      }
+      return retVal;
+   }
+
+   public boolean checkSamplesOnPath(List<ArmConfig> samples) {
+
+      Tester t = new Tester();
+      for (ArmConfig a : samples) {
+         if (t.hasCollision(a, obstacles)) {
+            return true;
+         }
+      }
+      return false;
    }
 
    public HashMap<ArmConfig, List<ArmConfig>> getMap() {
