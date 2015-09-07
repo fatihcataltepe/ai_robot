@@ -54,9 +54,9 @@ public class ProblemSpec {
    private List<Point2D.Double>                freeSpace;
    private HashMap<ArmConfig, List<ArmConfig>> map;
 
-   private static final int                    numOfTrialBtwObstacles = 50;   // 10
+   private static final int                    numOfTrialBtwObstacles = 4;   // 10
    private static final int                    numOfBaseBtwObstacles  = 50;   // 20
-   private static final int                    numOfTrialOnBase       = 20;   // 5
+   private static final int                    numOfTrialOnBase       = 50;   // 5
    private static final int                    numOfUniformBase       = 50;   // 50
 
    /**
@@ -115,7 +115,15 @@ public class ProblemSpec {
       finally {
          input.close();
       }
-      createConfigurationSpace();
+       long startTime = System.currentTimeMillis();
+      int counter = 0;
+      while(randomArms == null || randomArms.size() == 0 ){
+         System.out.println(String.format("%d th trial in progress", ++counter));
+         createConfigurationSpace();
+
+      }
+
+       System.out.println("found in: "+ (System.currentTimeMillis()-startTime));
    }
 
    /**
@@ -295,6 +303,7 @@ public class ProblemSpec {
       Tester t = new Tester();
       randomArms = new ArrayList<>();
       freeSpace = new ArrayList<>();
+       System.out.println("Creating random confs between obstacles...");
 
       // creates random points between obstacles
       for (int k = 0; k < numOfTrialBtwObstacles; k++) {
@@ -314,15 +323,15 @@ public class ProblemSpec {
                   // selects 5 configurations per a base between two obstacles
                   for (int l = 0; l < numOfTrialOnBase; l++) {
                      ArmConfig temp = ArmConfig.factory(p3, jointCount);
-                     if (!t.hasCollision(temp, obstacles) && t.fitsBounds(temp)) {
+                     if (!t.hasCollision(temp, obstacles) && t.fitsBounds(temp) && !t.hasSelfCollision(temp)) {
                         randomArms.add(temp);
                         done = true;
                         break;
                      }
 
                   }
-                  if (done)
-                     break;
+//                  if (done)
+//                     break;
 
                }
             }
@@ -330,10 +339,12 @@ public class ProblemSpec {
       }
 
       // creates uniformly distributed random configurations
-      int counter = 0;
+       System.out.println("Creating random confs in free space...");
+
+       int counter = 0;
       while (counter < numOfUniformBase) {
          ArmConfig temp = ArmConfig.factory(jointCount);
-         if (!t.hasCollision(temp, obstacles) && t.fitsBounds(temp)) {
+         if (!t.hasCollision(temp, obstacles) && t.fitsBounds(temp) && !t.hasSelfCollision(temp)) {
             randomArms.add(temp);
             counter++;
          }
@@ -359,56 +370,6 @@ public class ProblemSpec {
 
    }
 
-   // private void createConfigurationSpace() {
-   // Tester t = new Tester();
-   // randomArms = new ArrayList<>();
-   // freeSpace = new ArrayList<>();
-   //
-   // int counter = 0;
-   // int lastCollision = 0;
-   // int skip = 0;
-   // for (double i = 0; i < 1; i = i + precision) {
-   // for (double j = 0; j < 1; j = j + precision) {
-   // boolean check = true;
-   // if (skip > 0) {
-   // skip--;
-   // check = false;
-   // }
-   //
-   // if (check) {
-   // counter++;
-   // ArmConfig a = ArmConfig.factory(new Point2D.Double(i, j), jointCount);
-   //
-   // if (!t.hasCollision(a, obstacles)) {
-   // // System.out.println(i + " " + j + "free");
-   //
-   // if (t.fitsBounds(a)) {
-   // freeSpace.add(new Point2D.Double(i, j));
-   // randomArms.add(a);
-   // }
-   //
-   // if (counter - lastCollision > 10)
-   // skip = 5;
-   // if (counter - lastCollision > 20)
-   // skip = 10;
-   // if (counter - lastCollision > 30)
-   // skip = 20;
-   // }
-   // else {
-   // // System.out.println(i + " " + j + "collision");
-   // lastCollision = counter;
-   // }
-   // }
-   //
-   // }
-   // }
-   // System.out.println("total free space: " + freeSpace.size());
-   // System.out.println("total randomarms space: " + randomArms.size());
-   // System.out.println("total obstacle space: " + obstacles.size());
-   // Graph g = new Graph(randomArms, obstacles);
-   // map = g.getMap();
-   //
-   // }
 
    public List<ArmConfig> getRandomArms() {
       return randomArms;

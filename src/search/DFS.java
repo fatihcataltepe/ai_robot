@@ -1,10 +1,7 @@
 
 package search;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 import problem.ArmConfig;
 
@@ -30,13 +27,15 @@ public class DFS {
    }
 
    public List<ArmConfig> search() {
+      System.out.println("Looking for a proper path...");
+
       recursion(root);
       System.out.println("searching is finished");
       System.out.println("path size is: " + path.size());
-      return path;
+      return makePathShorter();
    }
 
-   public boolean recursion(ArmConfig curr) {
+   private boolean recursion(ArmConfig curr) {
       if (!visited.contains(curr)) {
          // System.out.println("searching..." + path.size());
          visited.add(curr);
@@ -55,4 +54,26 @@ public class DFS {
       return false;
 
    }
+
+   private List<ArmConfig> makePathShorter(){
+      List<ArmConfig> originalPath = path;
+      List<ArmConfig> shorterPath = new ArrayList<>();
+
+      for (int i = 0; i < originalPath.size(); i++) {
+         ArmConfig curr = originalPath.get(i);
+         List<ArmConfig> currChildren = map.get(curr);
+
+         shorterPath.add(curr);
+         for (int j = originalPath.size()-1; j > i; j--) {
+            ArmConfig test = originalPath.get(j);
+            if(currChildren.contains(test)){
+               i = j - 1;
+               break;
+            }
+         }
+      }
+      System.out.println("path size reduced to: "+ shorterPath.size() );
+      return shorterPath;
+
+    }
 }

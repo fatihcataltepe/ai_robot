@@ -22,10 +22,9 @@ public class Graph {
    public Graph(List<ArmConfig> randomArms, List<Obstacle> obstacles) {
       this.obstacles = obstacles;
 
-      int counterWrong = 0;
-      int counterRight = 0;
-
       map = new HashMap<>();
+
+      System.out.println("Creating graph between confs...");
 
       for (int i = 0; i < randomArms.size(); i++) {
          ArmConfig curr = randomArms.get(i);
@@ -47,12 +46,7 @@ public class Graph {
             if (d != 0) {
                ArmConfig arm = treeMap.get(d);
                boolean checkPath = checkSamplesOnPath(getArmsOnPath(curr, arm));
-               if (checkPath) {
-                  counterWrong++;
-               }
-               else {
-                  counterRight++;
-               }
+
                if (!checkObstacles(curr.getBase(), arm.getBase()) && !checkPath) {
                   counter++;
                   map.get(curr).add(arm);
@@ -61,8 +55,8 @@ public class Graph {
             if (counter >= numOfEdges)
                break;
          }
-//         System.out.println("collision: " + counterWrong);
-//         System.out.println("collision free: " + counterRight);
+         // System.out.println("collision: " + counterWrong);
+         // System.out.println("collision free: " + counterRight);
          // printMap(map);
       }
    }
@@ -115,7 +109,7 @@ public class Graph {
 
       Tester t = new Tester();
       for (ArmConfig a : samples) {
-         if (t.hasCollision(a, obstacles)) {
+         if (t.hasCollision(a, obstacles) || t.hasSelfCollision(a) || !t.fitsBounds(a)) {
             return true;
          }
       }
