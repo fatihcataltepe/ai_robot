@@ -220,12 +220,15 @@ public class ArmConfig {
 
    @Override
    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
+      if (this == o)
+         return true;
+      if (o == null || getClass() != o.getClass())
+         return false;
 
       ArmConfig armConfig = (ArmConfig) o;
 
-      if (!base.equals(armConfig.base)) return false;
+      if (!base.equals(armConfig.base))
+         return false;
       return jointAngles.equals(armConfig.jointAngles);
 
    }
@@ -235,5 +238,19 @@ public class ArmConfig {
       int result = base.hashCode();
       result = 31 * result + jointAngles.hashCode();
       return result;
+   }
+
+   public double addX(double diff) {
+      double x = base.getX();
+      return x + diff;
+   }
+
+   public double addY(double diff) {
+      double y = base.getY();
+      return y + diff;
+   }
+
+   public double changeJointAngle(int index, double diff) {
+      return jointAngles.get(index) + diff;
    }
 }

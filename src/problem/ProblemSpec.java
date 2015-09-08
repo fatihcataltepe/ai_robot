@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.*;
 
 import model.Graph;
+import search.Connector;
 import search.DFS;
 import tester.Tester;
 
@@ -54,10 +55,10 @@ public class ProblemSpec {
    private List<Point2D.Double>                freeSpace;
    private HashMap<ArmConfig, List<ArmConfig>> map;
 
-   private static final int                    numOfTrialBtwObstacles = 4;   // 10
+   private static final int                    numOfTrialBtwObstacles = 2;    // 10
    private static final int                    numOfBaseBtwObstacles  = 50;   // 20
    private static final int                    numOfTrialOnBase       = 50;   // 5
-   private static final int                    numOfUniformBase       = 50;   // 50
+   private static final int                    numOfUniformBase       = 100;   // 50
 
    /**
     * Loads a problem from a problem text file.
@@ -115,15 +116,15 @@ public class ProblemSpec {
       finally {
          input.close();
       }
-       long startTime = System.currentTimeMillis();
+      long startTime = System.currentTimeMillis();
       int counter = 0;
-      while(randomArms == null || randomArms.size() == 0 ){
+      while (randomArms == null || randomArms.size() == 0) {
          System.out.println(String.format("%d th trial in progress", ++counter));
          createConfigurationSpace();
 
       }
 
-       System.out.println("found in: "+ (System.currentTimeMillis()-startTime));
+      System.out.println("found in: " + (System.currentTimeMillis() - startTime));
    }
 
    /**
@@ -186,7 +187,7 @@ public class ProblemSpec {
       }
       String ls = System.getProperty("line.separator");
       FileWriter output = new FileWriter(filename);
-      output.write(String.format("%d %s", path.size() - 1, ls));
+      output.write(String.format("%d%s", path.size() - 1, ls));
       for (ArmConfig cfg : path) {
          output.write(cfg + ls);
       }
@@ -303,7 +304,7 @@ public class ProblemSpec {
       Tester t = new Tester();
       randomArms = new ArrayList<>();
       freeSpace = new ArrayList<>();
-       System.out.println("Creating random confs between obstacles...");
+      System.out.println("Creating random confs between obstacles...");
 
       // creates random points between obstacles
       for (int k = 0; k < numOfTrialBtwObstacles; k++) {
@@ -330,8 +331,8 @@ public class ProblemSpec {
                      }
 
                   }
-//                  if (done)
-//                     break;
+                  // if (done)
+                  // break;
 
                }
             }
@@ -339,9 +340,9 @@ public class ProblemSpec {
       }
 
       // creates uniformly distributed random configurations
-       System.out.println("Creating random confs in free space...");
+      System.out.println("Creating random confs in free space...");
 
-       int counter = 0;
+      int counter = 0;
       while (counter < numOfUniformBase) {
          ArmConfig temp = ArmConfig.factory(jointCount);
          if (!t.hasCollision(temp, obstacles) && t.fitsBounds(temp) && !t.hasSelfCollision(temp)) {
@@ -360,7 +361,9 @@ public class ProblemSpec {
       DFS dfs = new DFS(initialState, goalState, map);
       randomArms = dfs.search();
 
-      setPath(randomArms);
+      Connector connector = new Connector(randomArms);
+
+      setPath(connector.connectPath());
       try {
          saveSolution("fatih.txt");
       }
@@ -369,7 +372,6 @@ public class ProblemSpec {
       }
 
    }
-
 
    public List<ArmConfig> getRandomArms() {
       return randomArms;

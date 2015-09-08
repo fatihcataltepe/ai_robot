@@ -8,6 +8,7 @@ import java.util.*;
 
 import problem.ArmConfig;
 import problem.Obstacle;
+import search.Connector;
 import tester.Tester;
 
 /**
@@ -18,6 +19,7 @@ public class Graph {
    private List<Obstacle>                      obstacles;
    private final int                           numOfEdges         = 10;
    private int                                 numOfSamplesOnPath = 10;
+   Connector connector;
 
    public Graph(List<ArmConfig> randomArms, List<Obstacle> obstacles) {
       this.obstacles = obstacles;
@@ -45,7 +47,7 @@ public class Graph {
          for (Double d : sortedSet) {
             if (d != 0) {
                ArmConfig arm = treeMap.get(d);
-               boolean checkPath = checkSamplesOnPath(getArmsOnPath(curr, arm));
+               boolean checkPath = checkSamplesOnPath(connectTwoConf(curr, arm));
 
                if (!checkObstacles(curr.getBase(), arm.getBase()) && !checkPath) {
                   counter++;
@@ -80,31 +82,6 @@ public class Graph {
       }
    }
 
-   public List<ArmConfig> getArmsOnPath(ArmConfig a, ArmConfig b) {
-      List<ArmConfig> retVal = new ArrayList<>();
-
-      double deltaX = (b.getBase().getX() - a.getBase().getX()) / numOfSamplesOnPath;
-      double deltaY = (b.getBase().getY() - a.getBase().getY()) / numOfSamplesOnPath;
-
-      List<Double> deltaAngles = new ArrayList<>();
-      for (int i = 0; i < a.getJointAngles().size(); i++) {
-         deltaAngles.add((b.getJointAngles().get(i) - a.getJointAngles().get(i)) / numOfSamplesOnPath);
-      }
-
-      for (int i = 0; i < numOfSamplesOnPath; i++) {
-         double x = a.getBase().getX() + (i * deltaX);
-         double y = a.getBase().getY() + (i * deltaY);
-
-         List<Double> jointAngles = new ArrayList<>();
-         for (int j = 0; j < a.getJointAngles().size(); j++) {
-            jointAngles.add(a.getJointAngles().get(j) + (i * deltaAngles.get(j)));
-         }
-
-         retVal.add(new ArmConfig(new Point2D.Double(x, y), jointAngles));
-      }
-      return retVal;
-   }
-
    public boolean checkSamplesOnPath(List<ArmConfig> samples) {
 
       Tester t = new Tester();
@@ -118,5 +95,72 @@ public class Graph {
 
    public HashMap<ArmConfig, List<ArmConfig>> getMap() {
       return map;
+   }
+
+   private List<ArmConfig> connectTwoConf(ArmConfig a, ArmConfig b) {
+       double MAX_BASE = Tester.MAX_BASE_STEP*80;
+       double MAX_JOINT = Tester.MAX_JOINT_STEP*80;
+
+
+      // Decides primitive steps of base
+      double primitiveX = b.getBase().getX() - a.getBase().getX() < 0 ? -1 * MAX_BASE : MAX_BASE;
+      double primitiveY = b.getBase().getY() - a.getBase().getY() < 0 ? -1 * MAX_BASE : MAX_BASE;
+
+      // decides primitive steps of joints
+      List<Double> primitiveJoint = new ArrayList<>();
+      for (int i = 0; i < a.getJointAngles().size(); i++) {
+         if (b.getJointAngles().get(i) - a.getJointAngles().get(i) < 0) {
+            primitiveJoint.add(-1 * MAX_JOINT);
+         }
+         else {
+            primitiveJoint.add(MAX_JOINT);
+         }
+      }
+
+      boolean isFinished = false;
+      ArmConfig nextArm;
+      List<ArmConfig> pathBetween = new ArrayList<>();
+      pathBetween.add(a);
+
+      while (!isFinished) {
+         isFinished = true;
+         nextArm = pathBetween.get(pathBetween.size() - 1);
+
+
+         double nextX, nextY;
+         // calculate new X
+         if (Math.abs(b.getBase().getX() - nextArm.getBase().getX()) > MAX_BASE) {
+            isFinished = false;
+            nextX = nextArm.getBase().getX() + primitiveX;
+         }
+         else {
+            nextX = b.getBase().getX();
+         }
+
+         // calculate new y
+         if (Math.abs(b.getBase().getY() - nextArm.getBase().getY()) > MAX_BASE) {
+            isFinished = false;
+            nextY = nextArm.getBase().getY() + primitiveY;
+         }
+         else {
+            nextY = b.getBase().getY();
+         }
+
+         List<Double> nextJointAngles = new ArrayList<>();
+         for (int i = 0; i < nextArm.getJointAngles().size(); i++) {
+            if (Math.abs(b.getJointAngles().get(i) - nextArm.getJointAngles().get(i)) > MAX_JOINT) {
+               isFinished = false;
+               nextJointAngles.add(nextArm.getJointAngles().get(i) + primitiveJoint.get(i));
+            }
+            else {
+               nextJointAngles.add(b.getJointAngles().get(i));
+            }
+         }
+
+         // adds new configuration to the path
+         pathBetween.add(new ArmConfig(new Point2D.Double(nextX, nextY), nextJointAngles));
+      }
+      return pathBetween;
+
    }
 }
