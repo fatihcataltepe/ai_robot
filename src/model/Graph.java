@@ -19,7 +19,7 @@ public class Graph {
    private List<Obstacle>                      obstacles;
    private final int                           numOfEdges         = 10;
    private int                                 numOfSamplesOnPath = 10;
-   Connector connector;
+   Connector                                   connector;
 
    public Graph(List<ArmConfig> randomArms, List<Obstacle> obstacles) {
       this.obstacles = obstacles;
@@ -97,10 +97,10 @@ public class Graph {
       return map;
    }
 
+   // TODO update this part according to path finder in the Connector class
    private List<ArmConfig> connectTwoConf(ArmConfig a, ArmConfig b) {
-       double MAX_BASE = Tester.MAX_BASE_STEP*80;
-       double MAX_JOINT = Tester.MAX_JOINT_STEP*80;
-
+      double MAX_BASE = Tester.MAX_BASE_STEP * 200;
+      double MAX_JOINT = Tester.MAX_JOINT_STEP * 200;
 
       // Decides primitive steps of base
       double primitiveX = b.getBase().getX() - a.getBase().getX() < 0 ? -1 * MAX_BASE : MAX_BASE;
@@ -125,7 +125,6 @@ public class Graph {
       while (!isFinished) {
          isFinished = true;
          nextArm = pathBetween.get(pathBetween.size() - 1);
-
 
          double nextX, nextY;
          // calculate new X
@@ -163,4 +162,5 @@ public class Graph {
       return pathBetween;
 
    }
+
 }

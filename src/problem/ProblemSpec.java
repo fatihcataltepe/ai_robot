@@ -55,10 +55,10 @@ public class ProblemSpec {
    private List<Point2D.Double>                freeSpace;
    private HashMap<ArmConfig, List<ArmConfig>> map;
 
-   private static final int                    numOfTrialBtwObstacles = 2;    // 10
+   private static final int                    numOfTrialBtwObstacles = 6;    // 10
    private static final int                    numOfBaseBtwObstacles  = 50;   // 20
    private static final int                    numOfTrialOnBase       = 50;   // 5
-   private static final int                    numOfUniformBase       = 100;   // 50
+   private static final int                    numOfUniformBase       = 100;  // 50
 
    /**
     * Loads a problem from a problem text file.
@@ -120,7 +120,11 @@ public class ProblemSpec {
       int counter = 0;
       while (randomArms == null || randomArms.size() == 0) {
          System.out.println(String.format("%d th trial in progress", ++counter));
-         createConfigurationSpace();
+         solveProblem();
+         if (System.currentTimeMillis() - startTime > 60000) {
+            System.out.println("TIME IS UP, NO VALID PATH FOUND!");
+            System.exit(0);
+         }
 
       }
 
@@ -300,7 +304,7 @@ public class ProblemSpec {
       return solutionLoaded;
    }
 
-   private void createConfigurationSpace() {
+   private void solveProblem() {
       Tester t = new Tester();
       randomArms = new ArrayList<>();
       freeSpace = new ArrayList<>();
@@ -361,14 +365,22 @@ public class ProblemSpec {
       DFS dfs = new DFS(initialState, goalState, map);
       randomArms = dfs.search();
 
-      Connector connector = new Connector(randomArms);
+      Connector connector = new Connector(randomArms, obstacles);
+      List<ArmConfig> solution = connector.connectPath();
 
-      setPath(connector.connectPath());
-      try {
-         saveSolution("fatih.txt");
+      if (solution != null) {
+         setPath(solution);
+         try {
+            saveSolution("fatih.txt");
+         }
+         catch (IOException e) {
+            e.printStackTrace();
+         }
       }
-      catch (IOException e) {
-         e.printStackTrace();
+
+      else {
+         solution = null;
+         randomArms = null;
       }
 
    }
