@@ -1,0 +1,2 @@
+#!/bin/bash
+java -jar build/jar/a1-3702.jar $1 $2
