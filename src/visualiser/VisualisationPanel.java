@@ -171,14 +171,6 @@ public class VisualisationPanel extends JComponent {
       g2.setColor(Color.WHITE);
       g2.fillRect(0, 0, getWidth(), getHeight());
 
-      // g2.setColor(Color.black);
-      // for (int i = 0; i < getWidth(); i = i + (getWidth() / 100)) {
-      // for (int j = 0; j < getHeight(); j = j + (getHeight() / 100)) {
-      // System.out.println("asdasdasd");
-      // g2.fillRect(i, j, 3, 3);
-      // }
-      // }
-
       List<Obstacle> obstacles = problemSetup.getObstacles();
       if (obstacles != null) {
          g2.setColor(Color.red);
@@ -208,38 +200,6 @@ public class VisualisationPanel extends JComponent {
             g2.setColor(Color.green);
             paintState(g2, problemSetup.getGoalState());
 
-            // --------------------------------------------------------------------------------
-            // Iterator it = problemSetup.getMap().entrySet().iterator();
-            // while (it.hasNext()) {
-            // Map.Entry<ArmConfig, List<ArmConfig>> pair = (Map.Entry) it.next();
-            // ArmConfig curr = pair.getKey();
-            // ArrayList<ArmConfig> children = (ArrayList<ArmConfig>) pair.getValue();
-            //
-            // int counter = 0;
-            // for (ArmConfig c : children) {
-            // g2.setColor(Color.black);
-            // g2.drawLine((int) (curr.getBase().getX() * getWidth()),
-            // (int) (getHeight() - getHeight() * curr.getBase().getY()),
-            // (int) (c.getBase().getX() * getWidth()),
-            // (int) (getHeight() - getHeight() * c.getBase().getY()));
-            //
-            // }
-            //
-            // it.remove(); // avoids a ConcurrentModificationException
-            // }
-
-            int cun = 0;
-            for (Point2D.Double f : problemSetup.getFreeSpace()) {
-               System.out.println(cun++);
-               g2.setColor(Color.green);
-               // g2.drawRect((int) (f.getX() * getWidth()), (int) (getHeight() - f.getY() * getHeight()), 3, 3);
-               // paintState(g2, new ArmConfig(f, new ArrayList<Double>()));
-            }
-
-            for (ArmConfig a : problemSetup.getRandomArms()) {
-//               paintState(g2, a);
-            }
-            // --------------------------------------------------------------------------------
          }
       }
       else {

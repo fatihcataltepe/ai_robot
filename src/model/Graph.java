@@ -8,8 +8,6 @@ import java.util.*;
 
 import problem.ArmConfig;
 import problem.Obstacle;
-import search.Connector;
-import tester.Tester;
 
 /**
  * Created by fatihcataltepe on 01/09/15.
@@ -17,16 +15,12 @@ import tester.Tester;
 public class Graph {
    private HashMap<ArmConfig, List<ArmConfig>> map;
    private List<Obstacle>                      obstacles;
-   private final int                           numOfEdges         = 20;
-   private int                                 numOfSamplesOnPath = 10;
-   Connector                                   connector;
+   private final int                           numOfEdges = 30;
 
    public Graph(List<ArmConfig> randomArms, List<Obstacle> obstacles) {
       this.obstacles = obstacles;
 
       map = new HashMap<>();
-
-      System.out.println("Creating graph between confs...");
 
       for (int i = 0; i < randomArms.size(); i++) {
          ArmConfig curr = randomArms.get(i);
@@ -47,8 +41,6 @@ public class Graph {
          for (Double d : sortedSet) {
             if (d != 0) {
                ArmConfig arm = treeMap.get(d);
-//               boolean checkPath = checkSamplesOnPath(connectTwoConf(curr, arm));
-
                if (!checkObstacles(curr.getBase(), arm.getBase())) {
                   counter++;
                   map.get(curr).add(arm);
@@ -70,95 +62,8 @@ public class Graph {
       return false;
    }
 
-
-   public static void printMap(Map mp) {
-      Iterator it = mp.entrySet().iterator();
-      while (it.hasNext()) {
-         Map.Entry<ArmConfig, List<ArmConfig>> pair = (Map.Entry) it.next();
-         System.out.println(pair.getKey() + " = " + pair.getValue().size());
-         it.remove(); // avoids a ConcurrentModificationException
-      }
-   }
-
-   public boolean checkSamplesOnPath(List<ArmConfig> samples) {
-
-      Tester t = new Tester();
-      for (ArmConfig a : samples) {
-         if (t.hasCollision(a, obstacles) || t.hasSelfCollision(a) || !t.fitsBounds(a)) {
-            return true;
-         }
-      }
-      return false;
-   }
-
    public HashMap<ArmConfig, List<ArmConfig>> getMap() {
       return map;
-   }
-
-   // TODO update this part according to path finder in the Connector class
-   private List<ArmConfig> connectTwoConf(ArmConfig a, ArmConfig b) {
-      double MAX_BASE = Tester.MAX_BASE_STEP * 200;
-      double MAX_JOINT = Tester.MAX_JOINT_STEP * 200;
-
-      // Decides primitive steps of base
-      double primitiveX = b.getBase().getX() - a.getBase().getX() < 0 ? -1 * MAX_BASE : MAX_BASE;
-      double primitiveY = b.getBase().getY() - a.getBase().getY() < 0 ? -1 * MAX_BASE : MAX_BASE;
-
-      // decides primitive steps of joints
-      List<Double> primitiveJoint = new ArrayList<>();
-      for (int i = 0; i < a.getJointAngles().size(); i++) {
-         if (b.getJointAngles().get(i) - a.getJointAngles().get(i) < 0) {
-            primitiveJoint.add(-1 * MAX_JOINT);
-         }
-         else {
-            primitiveJoint.add(MAX_JOINT);
-         }
-      }
-
-      boolean isFinished = false;
-      ArmConfig nextArm;
-      List<ArmConfig> pathBetween = new ArrayList<>();
-      pathBetween.add(a);
-
-      while (!isFinished) {
-         isFinished = true;
-         nextArm = pathBetween.get(pathBetween.size() - 1);
-
-         double nextX, nextY;
-         // calculate new X
-         if (Math.abs(b.getBase().getX() - nextArm.getBase().getX()) > MAX_BASE) {
-            isFinished = false;
-            nextX = nextArm.getBase().getX() + primitiveX;
-         }
-         else {
-            nextX = b.getBase().getX();
-         }
-
-         // calculate new y
-         if (Math.abs(b.getBase().getY() - nextArm.getBase().getY()) > MAX_BASE) {
-            isFinished = false;
-            nextY = nextArm.getBase().getY() + primitiveY;
-         }
-         else {
-            nextY = b.getBase().getY();
-         }
-
-         List<Double> nextJointAngles = new ArrayList<>();
-         for (int i = 0; i < nextArm.getJointAngles().size(); i++) {
-            if (Math.abs(b.getJointAngles().get(i) - nextArm.getJointAngles().get(i)) > MAX_JOINT) {
-               isFinished = false;
-               nextJointAngles.add(nextArm.getJointAngles().get(i) + primitiveJoint.get(i));
-            }
-            else {
-               nextJointAngles.add(b.getJointAngles().get(i));
-            }
-         }
-
-         // adds new configuration to the path
-         pathBetween.add(new ArmConfig(new Point2D.Double(nextX, nextY), nextJointAngles));
-      }
-      return pathBetween;
-
    }
 
 }

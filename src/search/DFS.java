@@ -33,16 +33,11 @@ public class DFS {
    }
 
    public List<ArmConfig> search() {
-      System.out.println("Looking for a proper path...");
 
       if(recursion(root) == false){
-         System.out.println("recursion is not successful!");
        return null;
       }
-      System.out.println("searching is finished");
-      System.out.println("path size is: " + path.size());
       return makePathShorter();
-//      return path;
    }
 
    private boolean recursion(ArmConfig curr) {
@@ -50,13 +45,10 @@ public class DFS {
          path.push(curr);
       }
       if (!visited.contains(curr) && chechPathUsingConnector(path.peek(), curr)) {
-         // System.out.println("searching..." + path.size());
-
             visited.add(curr);
             path.push(curr);
 
          if (goal.equals(curr)) {
-            System.out.println("found!!");
             return true;
          }
 
@@ -87,7 +79,6 @@ public class DFS {
             }
          }
       }
-      System.out.println("path size reduced to: " + shorterPath.size());
       return shorterPath;
 
    }
@@ -96,7 +87,7 @@ public class DFS {
       ArrayList<ArmConfig> list = new ArrayList<>();
       list.add(a);
       list.add(b);
-      Connector connector = new Connector(obstacles, Tester.MAX_BASE_STEP * 10, Tester.MAX_JOINT_STEP * 10);
+      Connector connector = new Connector(obstacles, Tester.MAX_BASE_STEP * 5, Tester.MAX_JOINT_STEP * 5);
       if (connector.connectPath(list) == null) {
          return false;
       }

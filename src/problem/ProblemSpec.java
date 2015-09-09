@@ -54,11 +54,10 @@ public class ProblemSpec {
    private List<ArmConfig>                     path;
 
    private List<ArmConfig>                     randomArms;
-   private List<Point2D.Double>                freeSpace;
    private HashMap<ArmConfig, List<ArmConfig>> map;
 
-   private static final int                    numOfTrialBtwObstacles = 2;    // 10
-   private static final int                    numOfBaseBtwObstacles  = 30;   // 20
+   private static final int                    numOfTrialBtwObstacles = 1;    // 10
+   private static int                          numOfBaseBtwObstacles  = 15;   // 20
    private static final int                    numOfTrialOnBase       = 30;   // 5
    private static final int                    numOfUniformBase       = 150;  // 50
 
@@ -119,10 +118,17 @@ public class ProblemSpec {
          input.close();
       }
 
+      // solve the problem
       long startTime = System.currentTimeMillis();
       int counter = 0;
       while (randomArms == null || randomArms.size() == 0) {
          System.out.println(String.format("%d th trial in progress", ++counter));
+
+          if (numOfBaseBtwObstacles == 30)
+          numOfBaseBtwObstacles = 15;
+          else
+          numOfBaseBtwObstacles = 30;
+
          solveProblem();
          if (System.currentTimeMillis() - startTime > 60000) {
             System.out.println("TIME IS UP, NO VALID PATH FOUND!");
@@ -131,7 +137,7 @@ public class ProblemSpec {
 
       }
 
-      System.out.println("found in: " + (System.currentTimeMillis() - startTime));
+      System.out.println("found in: " + (System.currentTimeMillis() - startTime) + " millseconds");
    }
 
    /**
@@ -310,7 +316,6 @@ public class ProblemSpec {
    private void solveProblem() {
       Tester t = new Tester();
       randomArms = new ArrayList<>();
-      freeSpace = new ArrayList<>();
       System.out.println("Creating random confs between obstacles...");
 
       // creates random points between obstacles
@@ -360,22 +365,26 @@ public class ProblemSpec {
 
       randomArms.add(initialState);
       randomArms.add(goalState);
-      System.out.println("random arms: " + randomArms.size());
+
+      System.out.println("creating graph...");
 
       Graph graph = new Graph(randomArms, obstacles);
       map = graph.getMap();
 
+      System.out.println("implementing dfs...");
+
       DFS dfs = new DFS(initialState, goalState, map, obstacles);
       randomArms = dfs.search();
 
-      Connector connector = new Connector( obstacles);
+      System.out.println("creating primitive steps");
+
+      Connector connector = new Connector(obstacles);
       List<ArmConfig> solution = connector.connectPath(randomArms);
-//      List<ArmConfig> solution = randomArms;
 
       if (solution != null) {
          setPath(solution);
          try {
-            saveSolution("fatih.txt");
+            saveSolution("solution");
          }
          catch (IOException e) {
             e.printStackTrace();
@@ -389,13 +398,6 @@ public class ProblemSpec {
 
    }
 
-   public List<ArmConfig> getRandomArms() {
-      return randomArms;
-   }
-
-   public List<Point2D.Double> getFreeSpace() {
-      return freeSpace;
-   }
 
    public HashMap<ArmConfig, List<ArmConfig>> getMap() {
       return map;

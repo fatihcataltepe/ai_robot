@@ -18,8 +18,6 @@ public class Connector {
    private Double MAX_BASE_STEP;
    private Double MAX_JOINT_STEP;
 
-   public Connector() {
-   }
 
    public Connector(List<Obstacle> obstacles) {
       this.pathBetween = new ArrayList<>();
@@ -44,28 +42,26 @@ public class Connector {
 
       pathBetween.clear();
       pathBetween.add(path.get(0));
-//      System.out.println("size of path: " + path.size());
 
       for (int i = 0; i < path.size() - 1; i++) {
          if (!connectTwoConf(path.get(i + 1))) {
-//            System.out.println("Exitting connecting path... " + i);
             return null;
          }
       }
       pathBetween.add(path.get(path.size() - 1));
-//      System.out.println("connected path size: " + pathBetween.size());
       return pathBetween;
    }
 
+   //searchs for a valid path between the last configuration and b
    private boolean connectTwoConf(ArmConfig b) {
 
       while (!pathBetween.get(pathBetween.size() - 1).isSimilar(b)) {
          boolean b1 = moveX(b);
          boolean b2 = moveY(b);
          boolean b3 = moveAngles(b);
-//         System.out.println("in the while loop" + " " + b1 + " " + b2 + " " + b3);
+
+         //if there is no available move breaks the loop
          if (!b1 && !b2 && !b3) {
-//            System.out.println("no available path");
             return false;
          }
       }
@@ -75,7 +71,10 @@ public class Connector {
    }
 
 
+   //moves the x of robot
    private boolean moveX(ArmConfig b) {
+
+      //the last configuration of the path is nextarm
       ArmConfig nextArm = new ArmConfig(pathBetween.get(pathBetween.size() - 1));
       double primitiveX = b.getBase().getX() - nextArm.getBase().getX() < 0 ? -1 * this.MAX_BASE_STEP : this.MAX_BASE_STEP;
 
@@ -98,7 +97,9 @@ public class Connector {
 
    }
 
+   //moves the y of robot
    private boolean moveY(ArmConfig b) {
+      //the last configuration of the path is nextarm
       ArmConfig nextArm = new ArmConfig(pathBetween.get(pathBetween.size() - 1));
       double primitiveY = b.getBase().getY() - nextArm.getBase().getY() < 0 ? -1 * this.MAX_BASE_STEP : this.MAX_BASE_STEP;
 
@@ -121,6 +122,7 @@ public class Connector {
    }
 
    private boolean moveAngles(ArmConfig b) {
+      //the last configuration of the path is nextarm
       ArmConfig nextArm = new ArmConfig(pathBetween.get(pathBetween.size() - 1));
 
       // decides primitive steps of joints
