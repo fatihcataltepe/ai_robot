@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_comp3702assg1" default="compile.module.comp3702assg1">
+  <dirname property="module.comp3702assg1.basedir" file="${ant.file.module_comp3702assg1}"/>
+  
+  <property name="module.jdk.home.comp3702assg1" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.comp3702assg1" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.comp3702assg1" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.comp3702assg1" value="-encoding UTF-8 -source 8 ${compiler.args}"/>
+  
+  <property name="comp3702assg1.output.dir" value="${module.comp3702assg1.basedir}/out/production/Comp3702Assg1"/>
+  <property name="comp3702assg1.testoutput.dir" value="${module.comp3702assg1.basedir}/out/test/Comp3702Assg1"/>
+  
+  <path id="comp3702assg1.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="comp3702assg1.module.production.classpath">
+    <path refid="${module.jdk.classpath.comp3702assg1}"/>
+  </path>
+  
+  <path id="comp3702assg1.runtime.production.module.classpath">
+    <pathelement location="${comp3702assg1.output.dir}"/>
+  </path>
+  
+  <path id="comp3702assg1.module.classpath">
+    <path refid="${module.jdk.classpath.comp3702assg1}"/>
+    <pathelement location="${comp3702assg1.output.dir}"/>
+  </path>
+  
+  <path id="comp3702assg1.runtime.module.classpath">
+    <pathelement location="${comp3702assg1.testoutput.dir}"/>
+    <pathelement location="${comp3702assg1.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.comp3702assg1">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.comp3702assg1">
+    <patternset refid="excluded.from.module.comp3702assg1"/>
+  </patternset>
+  
+  <path id="comp3702assg1.module.sourcepath">
+    <dirset dir="${module.comp3702assg1.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.comp3702assg1" depends="compile.module.comp3702assg1.production,compile.module.comp3702assg1.tests" description="Compile module Comp3702Assg1"/>
+  
+  <target name="compile.module.comp3702assg1.production" depends="register.custom.compilers" description="Compile module Comp3702Assg1; production classes">
+    <mkdir dir="${comp3702assg1.output.dir}"/>
+    <javac2 destdir="${comp3702assg1.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.comp3702assg1}/javac">
+      <compilerarg line="${compiler.args.comp3702assg1}"/>
+      <bootclasspath refid="comp3702assg1.module.bootclasspath"/>
+      <classpath refid="comp3702assg1.module.production.classpath"/>
+      <src refid="comp3702assg1.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.comp3702assg1"/>
+    </javac2>
+    
+    <copy todir="${comp3702assg1.output.dir}">
+      <fileset dir="${module.comp3702assg1.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.comp3702assg1.tests" depends="register.custom.compilers,compile.module.comp3702assg1.production" description="compile module Comp3702Assg1; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.comp3702assg1" description="cleanup module">
+    <delete dir="${comp3702assg1.output.dir}"/>
+    <delete dir="${comp3702assg1.testoutput.dir}"/>
+  </target>
+</project>

@@ -384,7 +384,7 @@ public class ProblemSpec {
       if (solution != null) {
          setPath(solution);
          try {
-            saveSolution("solution");
+            saveSolution("src/solution");
          }
          catch (IOException e) {
             e.printStackTrace();
