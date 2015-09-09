@@ -17,7 +17,7 @@ import tester.Tester;
 public class Graph {
    private HashMap<ArmConfig, List<ArmConfig>> map;
    private List<Obstacle>                      obstacles;
-   private final int                           numOfEdges         = 10;
+   private final int                           numOfEdges         = 20;
    private int                                 numOfSamplesOnPath = 10;
    Connector                                   connector;
 
@@ -47,9 +47,9 @@ public class Graph {
          for (Double d : sortedSet) {
             if (d != 0) {
                ArmConfig arm = treeMap.get(d);
-               boolean checkPath = checkSamplesOnPath(connectTwoConf(curr, arm));
+//               boolean checkPath = checkSamplesOnPath(connectTwoConf(curr, arm));
 
-               if (!checkObstacles(curr.getBase(), arm.getBase()) && !checkPath) {
+               if (!checkObstacles(curr.getBase(), arm.getBase())) {
                   counter++;
                   map.get(curr).add(arm);
                }
@@ -57,9 +57,6 @@ public class Graph {
             if (counter >= numOfEdges)
                break;
          }
-         // System.out.println("collision: " + counterWrong);
-         // System.out.println("collision free: " + counterRight);
-         // printMap(map);
       }
    }
 
@@ -72,6 +69,7 @@ public class Graph {
       }
       return false;
    }
+
 
    public static void printMap(Map mp) {
       Iterator it = mp.entrySet().iterator();

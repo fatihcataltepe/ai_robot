@@ -65,10 +65,14 @@ public class Obstacle {
       return rect.toString();
    }
 
-   public Point2D.Double createRandomPointinBetween() {
+   public Point2D.Double createRandomPointInBetween() {
       Random rand = new Random();
       double x = rect.getX() + rand.nextDouble() * rect.getWidth();
       double y = rect.getY() + rand.nextDouble() * rect.getHeight();
       return new Point2D.Double(x, y);
+   }
+
+   public Point2D.Double getCenter(){
+      return new Point2D.Double(getRect().getCenterX(),getRect().getCenterY());
    }
 }

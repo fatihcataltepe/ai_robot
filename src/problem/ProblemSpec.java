@@ -1,7 +1,9 @@
 
 package problem;
 
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -55,10 +57,10 @@ public class ProblemSpec {
    private List<Point2D.Double>                freeSpace;
    private HashMap<ArmConfig, List<ArmConfig>> map;
 
-   private static final int                    numOfTrialBtwObstacles = 6;    // 10
-   private static final int                    numOfBaseBtwObstacles  = 50;   // 20
-   private static final int                    numOfTrialOnBase       = 50;   // 5
-   private static final int                    numOfUniformBase       = 100;  // 50
+   private static final int                    numOfTrialBtwObstacles = 2;    // 10
+   private static final int                    numOfBaseBtwObstacles  = 30;   // 20
+   private static final int                    numOfTrialOnBase       = 30;   // 5
+   private static final int                    numOfUniformBase       = 150;  // 50
 
    /**
     * Loads a problem from a problem text file.
@@ -116,6 +118,7 @@ public class ProblemSpec {
       finally {
          input.close();
       }
+
       long startTime = System.currentTimeMillis();
       int counter = 0;
       while (randomArms == null || randomArms.size() == 0) {
@@ -317,28 +320,28 @@ public class ProblemSpec {
 
             for (int j = i + 1; j < obstacles.size(); j++) {
                Obstacle next = obstacles.get(j);
+               int collisions = getNumberOfCollision(curr.getCenter(), next.getCenter());
 
-               boolean done = false;
-               // selects 20 points per each pair of obstacle
-               for (int m = 0; m < numOfBaseBtwObstacles; m++) {
-                  Point2D.Double p1 = curr.createRandomPointinBetween();
-                  Point2D.Double p2 = next.createRandomPointinBetween();
-                  Point2D.Double p3 = new Point2D.Double((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2);
+               if (collisions <= 2) {
+                  // selects 20 points per each pair of obstacle
+                  for (int m = 0; m < numOfBaseBtwObstacles; m++) {
+                     Point2D.Double p1 = curr.createRandomPointInBetween();
+                     Point2D.Double p2 = next.createRandomPointInBetween();
 
-                  // selects 5 configurations per a base between two obstacles
-                  for (int l = 0; l < numOfTrialOnBase; l++) {
-                     ArmConfig temp = ArmConfig.factory(p3, jointCount);
-                     if (!t.hasCollision(temp, obstacles) && t.fitsBounds(temp) && !t.hasSelfCollision(temp)) {
-                        randomArms.add(temp);
-                        done = true;
-                        break;
+                     Point2D.Double p3 = new Point2D.Double((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2);
+
+                     // selects 5 configurations per a base between two obstacles
+                     for (int l = 0; l < numOfTrialOnBase; l++) {
+                        ArmConfig temp = ArmConfig.factory(p3, jointCount);
+                        if (!t.hasCollision(temp, obstacles) && t.fitsBounds(temp) && !t.hasSelfCollision(temp)) {
+                           randomArms.add(temp);
+                           break;
+                        }
+
                      }
-
                   }
-                  // if (done)
-                  // break;
-
                }
+
             }
          }
       }
@@ -362,11 +365,12 @@ public class ProblemSpec {
       Graph graph = new Graph(randomArms, obstacles);
       map = graph.getMap();
 
-      DFS dfs = new DFS(initialState, goalState, map);
+      DFS dfs = new DFS(initialState, goalState, map, obstacles);
       randomArms = dfs.search();
 
-      Connector connector = new Connector(randomArms, obstacles);
-      List<ArmConfig> solution = connector.connectPath();
+      Connector connector = new Connector( obstacles);
+      List<ArmConfig> solution = connector.connectPath(randomArms);
+//      List<ArmConfig> solution = randomArms;
 
       if (solution != null) {
          setPath(solution);
@@ -395,5 +399,16 @@ public class ProblemSpec {
 
    public HashMap<ArmConfig, List<ArmConfig>> getMap() {
       return map;
+   }
+
+   private int getNumberOfCollision(Point2D curr, Point2D child) {
+      int counter = 0;
+      for (Obstacle o : obstacles) {
+         Rectangle2D r = o.getRect();
+         Line2D l = new Line2D.Double(curr.getX(), curr.getY(), child.getX(), child.getY());
+         if (l.intersects(r))
+            counter++;
+      }
+      return counter;
    }
 }

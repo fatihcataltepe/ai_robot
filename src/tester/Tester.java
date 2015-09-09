@@ -549,7 +549,7 @@ public class Tester {
       System.exit(numFailures);
    }
 
-   public boolean validConfiguration(ArmConfig arm){
-      return !hasCollision(arm, ps.getObstacles()) && !hasSelfCollision(arm) && fitsBounds(arm);
+   public boolean validConfiguration(ArmConfig arm, List<Obstacle> obstacles) {
+      return !hasCollision(arm, obstacles) && !hasSelfCollision(arm) && fitsBounds(arm);
    }
 }
