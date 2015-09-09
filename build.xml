@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="comp3702assg1" default="all">
-  <target name="clean">
-  	<delete dir="build"/>
-  </target>
-  
-  <target name="compile">
-  	<mkdir dir="build/classes"/>
-  	<javac srcdir="src" destdir="build/classes" />
-  </target>
-  
-  <target name="jar">
-  	<mkdir dir="build/jar"/>
-    <jar destfile="build/jar/a1-3702.jar" basedir="build/classes">
-        <manifest>
-            <attribute name="Main-Class" value="visualiser.Visualiser"/>
-        </manifest>
-    </jar>
-  </target>
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes"/>
+    </target>
+
+    <target name="jar">
+        <mkdir dir="build/jar"/>
+        <jar destfile="build/jar/a1-3702.jar" basedir="build/classes">
+            <manifest>
+                <attribute name="Main-Class" value="visualiser.Visualiser"/>
+            </manifest>
+            <fileset dir="src">
+                <include name="visualiser/*.gif"></include>
+            </fileset>
+        </jar>
+    </target>
 </project>
